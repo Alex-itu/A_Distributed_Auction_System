@@ -1,16 +1,16 @@
 syntax = "proto3";
 
-option go_package = "github.com/JonasSkjodt/chitty-chat/proto";
+option go_package = "github.com/Alex-itu/A_Distributed_Auction_System/proto";
 
 package proto;
 
 // compile command:
-// protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/template.proto
+// protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/auction.proto
 
-service Chat {
-    rpc MessageStream(stream ChatMessage) returns (stream ChatMessage);
-    rpc ConnectToServer(stream ChatMessage) returns (Ack);
-    rpc DisconnectFromServer(ClientName) returns (Ack);
+service AuctionService {
+    rpc Bid(BidAmount) returns (Ack);
+    rpc Result(Void) returns (Outcome);
+    rpc connectionStream (stream BackupStream) returns (stream BackupStream);
 }
 
 
@@ -18,18 +18,18 @@ message Ack {
     string message = 1;
 }
 
-message ChatMessage {
-    string clientName = 1;
-    string content = 2; // Content field that should be limited to max 128 characters
-    int32 clientID = 3;
-    repeated int32 vectorClock = 4;
-}
-
-message ClientName {
-    string clientName = 1;
-}
-
-message ClientID {
+message BidAmount {
     int32 clientID = 1;
+    int32 amount = 2;
 }
 
+message Outcome {
+    int32 amount = 1;
+}
+
+message BackupStream {
+    //int32 bidamount = 1;
+    //something
+  }
+
+message Void {}

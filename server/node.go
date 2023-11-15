@@ -19,7 +19,7 @@ import (
 
 	"time"
 
-	hs "github.com/Alex-itu/Consensus_gRPC/proto"
+	hs "github.com/Alex-itu/A_Distributed_Auction_System/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

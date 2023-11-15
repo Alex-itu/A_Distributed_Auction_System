@@ -19,230 +19,196 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Chat_MessageStream_FullMethodName        = "/proto.Chat/MessageStream"
-	Chat_ConnectToServer_FullMethodName      = "/proto.Chat/ConnectToServer"
-	Chat_DisconnectFromServer_FullMethodName = "/proto.Chat/DisconnectFromServer"
+	AuctionService_Bid_FullMethodName              = "/proto.AuctionService/Bid"
+	AuctionService_Result_FullMethodName           = "/proto.AuctionService/Result"
+	AuctionService_ConnectionStream_FullMethodName = "/proto.AuctionService/connectionStream"
 )
 
-// ChatClient is the client API for Chat service.
+// AuctionServiceClient is the client API for AuctionService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ChatClient interface {
-	MessageStream(ctx context.Context, opts ...grpc.CallOption) (Chat_MessageStreamClient, error)
-	ConnectToServer(ctx context.Context, opts ...grpc.CallOption) (Chat_ConnectToServerClient, error)
-	DisconnectFromServer(ctx context.Context, in *ClientName, opts ...grpc.CallOption) (*Ack, error)
+type AuctionServiceClient interface {
+	Bid(ctx context.Context, in *BidAmount, opts ...grpc.CallOption) (*Ack, error)
+	Result(ctx context.Context, in *Void, opts ...grpc.CallOption) (*Outcome, error)
+	ConnectionStream(ctx context.Context, opts ...grpc.CallOption) (AuctionService_ConnectionStreamClient, error)
 }
 
-type chatClient struct {
+type auctionServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewChatClient(cc grpc.ClientConnInterface) ChatClient {
-	return &chatClient{cc}
+func NewAuctionServiceClient(cc grpc.ClientConnInterface) AuctionServiceClient {
+	return &auctionServiceClient{cc}
 }
 
-func (c *chatClient) MessageStream(ctx context.Context, opts ...grpc.CallOption) (Chat_MessageStreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Chat_ServiceDesc.Streams[0], Chat_MessageStream_FullMethodName, opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &chatMessageStreamClient{stream}
-	return x, nil
-}
-
-type Chat_MessageStreamClient interface {
-	Send(*ChatMessage) error
-	Recv() (*ChatMessage, error)
-	grpc.ClientStream
-}
-
-type chatMessageStreamClient struct {
-	grpc.ClientStream
-}
-
-func (x *chatMessageStreamClient) Send(m *ChatMessage) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *chatMessageStreamClient) Recv() (*ChatMessage, error) {
-	m := new(ChatMessage)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *chatClient) ConnectToServer(ctx context.Context, opts ...grpc.CallOption) (Chat_ConnectToServerClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Chat_ServiceDesc.Streams[1], Chat_ConnectToServer_FullMethodName, opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &chatConnectToServerClient{stream}
-	return x, nil
-}
-
-type Chat_ConnectToServerClient interface {
-	Send(*ChatMessage) error
-	CloseAndRecv() (*Ack, error)
-	grpc.ClientStream
-}
-
-type chatConnectToServerClient struct {
-	grpc.ClientStream
-}
-
-func (x *chatConnectToServerClient) Send(m *ChatMessage) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *chatConnectToServerClient) CloseAndRecv() (*Ack, error) {
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	m := new(Ack)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *chatClient) DisconnectFromServer(ctx context.Context, in *ClientName, opts ...grpc.CallOption) (*Ack, error) {
+func (c *auctionServiceClient) Bid(ctx context.Context, in *BidAmount, opts ...grpc.CallOption) (*Ack, error) {
 	out := new(Ack)
-	err := c.cc.Invoke(ctx, Chat_DisconnectFromServer_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, AuctionService_Bid_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ChatServer is the server API for Chat service.
-// All implementations must embed UnimplementedChatServer
+func (c *auctionServiceClient) Result(ctx context.Context, in *Void, opts ...grpc.CallOption) (*Outcome, error) {
+	out := new(Outcome)
+	err := c.cc.Invoke(ctx, AuctionService_Result_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *auctionServiceClient) ConnectionStream(ctx context.Context, opts ...grpc.CallOption) (AuctionService_ConnectionStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &AuctionService_ServiceDesc.Streams[0], AuctionService_ConnectionStream_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &auctionServiceConnectionStreamClient{stream}
+	return x, nil
+}
+
+type AuctionService_ConnectionStreamClient interface {
+	Send(*BackupStream) error
+	Recv() (*BackupStream, error)
+	grpc.ClientStream
+}
+
+type auctionServiceConnectionStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *auctionServiceConnectionStreamClient) Send(m *BackupStream) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *auctionServiceConnectionStreamClient) Recv() (*BackupStream, error) {
+	m := new(BackupStream)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// AuctionServiceServer is the server API for AuctionService service.
+// All implementations must embed UnimplementedAuctionServiceServer
 // for forward compatibility
-type ChatServer interface {
-	MessageStream(Chat_MessageStreamServer) error
-	ConnectToServer(Chat_ConnectToServerServer) error
-	DisconnectFromServer(context.Context, *ClientName) (*Ack, error)
-	mustEmbedUnimplementedChatServer()
+type AuctionServiceServer interface {
+	Bid(context.Context, *BidAmount) (*Ack, error)
+	Result(context.Context, *Void) (*Outcome, error)
+	ConnectionStream(AuctionService_ConnectionStreamServer) error
+	mustEmbedUnimplementedAuctionServiceServer()
 }
 
-// UnimplementedChatServer must be embedded to have forward compatible implementations.
-type UnimplementedChatServer struct {
+// UnimplementedAuctionServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedAuctionServiceServer struct {
 }
 
-func (UnimplementedChatServer) MessageStream(Chat_MessageStreamServer) error {
-	return status.Errorf(codes.Unimplemented, "method MessageStream not implemented")
+func (UnimplementedAuctionServiceServer) Bid(context.Context, *BidAmount) (*Ack, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Bid not implemented")
 }
-func (UnimplementedChatServer) ConnectToServer(Chat_ConnectToServerServer) error {
-	return status.Errorf(codes.Unimplemented, "method ConnectToServer not implemented")
+func (UnimplementedAuctionServiceServer) Result(context.Context, *Void) (*Outcome, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Result not implemented")
 }
-func (UnimplementedChatServer) DisconnectFromServer(context.Context, *ClientName) (*Ack, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DisconnectFromServer not implemented")
+func (UnimplementedAuctionServiceServer) ConnectionStream(AuctionService_ConnectionStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method ConnectionStream not implemented")
 }
-func (UnimplementedChatServer) mustEmbedUnimplementedChatServer() {}
+func (UnimplementedAuctionServiceServer) mustEmbedUnimplementedAuctionServiceServer() {}
 
-// UnsafeChatServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ChatServer will
+// UnsafeAuctionServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AuctionServiceServer will
 // result in compilation errors.
-type UnsafeChatServer interface {
-	mustEmbedUnimplementedChatServer()
+type UnsafeAuctionServiceServer interface {
+	mustEmbedUnimplementedAuctionServiceServer()
 }
 
-func RegisterChatServer(s grpc.ServiceRegistrar, srv ChatServer) {
-	s.RegisterService(&Chat_ServiceDesc, srv)
+func RegisterAuctionServiceServer(s grpc.ServiceRegistrar, srv AuctionServiceServer) {
+	s.RegisterService(&AuctionService_ServiceDesc, srv)
 }
 
-func _Chat_MessageStream_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ChatServer).MessageStream(&chatMessageStreamServer{stream})
-}
-
-type Chat_MessageStreamServer interface {
-	Send(*ChatMessage) error
-	Recv() (*ChatMessage, error)
-	grpc.ServerStream
-}
-
-type chatMessageStreamServer struct {
-	grpc.ServerStream
-}
-
-func (x *chatMessageStreamServer) Send(m *ChatMessage) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *chatMessageStreamServer) Recv() (*ChatMessage, error) {
-	m := new(ChatMessage)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func _Chat_ConnectToServer_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ChatServer).ConnectToServer(&chatConnectToServerServer{stream})
-}
-
-type Chat_ConnectToServerServer interface {
-	SendAndClose(*Ack) error
-	Recv() (*ChatMessage, error)
-	grpc.ServerStream
-}
-
-type chatConnectToServerServer struct {
-	grpc.ServerStream
-}
-
-func (x *chatConnectToServerServer) SendAndClose(m *Ack) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *chatConnectToServerServer) Recv() (*ChatMessage, error) {
-	m := new(ChatMessage)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func _Chat_DisconnectFromServer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ClientName)
+func _AuctionService_Bid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BidAmount)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ChatServer).DisconnectFromServer(ctx, in)
+		return srv.(AuctionServiceServer).Bid(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Chat_DisconnectFromServer_FullMethodName,
+		FullMethod: AuctionService_Bid_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChatServer).DisconnectFromServer(ctx, req.(*ClientName))
+		return srv.(AuctionServiceServer).Bid(ctx, req.(*BidAmount))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Chat_ServiceDesc is the grpc.ServiceDesc for Chat service.
+func _AuctionService_Result_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Void)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuctionServiceServer).Result(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuctionService_Result_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuctionServiceServer).Result(ctx, req.(*Void))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuctionService_ConnectionStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(AuctionServiceServer).ConnectionStream(&auctionServiceConnectionStreamServer{stream})
+}
+
+type AuctionService_ConnectionStreamServer interface {
+	Send(*BackupStream) error
+	Recv() (*BackupStream, error)
+	grpc.ServerStream
+}
+
+type auctionServiceConnectionStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *auctionServiceConnectionStreamServer) Send(m *BackupStream) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *auctionServiceConnectionStreamServer) Recv() (*BackupStream, error) {
+	m := new(BackupStream)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// AuctionService_ServiceDesc is the grpc.ServiceDesc for AuctionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Chat_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.Chat",
-	HandlerType: (*ChatServer)(nil),
+var AuctionService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.AuctionService",
+	HandlerType: (*AuctionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "DisconnectFromServer",
-			Handler:    _Chat_DisconnectFromServer_Handler,
+			MethodName: "Bid",
+			Handler:    _AuctionService_Bid_Handler,
+		},
+		{
+			MethodName: "Result",
+			Handler:    _AuctionService_Result_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "MessageStream",
-			Handler:       _Chat_MessageStream_Handler,
+			StreamName:    "connectionStream",
+			Handler:       _AuctionService_ConnectionStream_Handler,
 			ServerStreams: true,
-			ClientStreams: true,
-		},
-		{
-			StreamName:    "ConnectToServer",
-			Handler:       _Chat_ConnectToServer_Handler,
 			ClientStreams: true,
 		},
 	},
