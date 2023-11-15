@@ -1,6 +1,0 @@
-2023/10/30 13:42:00 client Bok: Attempts to dial on port 5400
-2023/10/30 13:42:00 the connection is:  READY
-2023/10/30 13:42:01 Server: "Participant Bok joined chitty-chat" at lamport timestamp: [5 1 2]
-2023/10/30 13:42:06 Server: "Participant Alike joined chitty-chat" at lamport timestamp: [8 1 3 1]
-2023/10/30 13:42:15 August: "Participant August left chitty-chat" at lamport timestamp: [15 6 6 1]
-2023/10/30 13:43:44 rpc error: code = Unavailable desc = error reading from server: read tcp 127.0.0.1:49154->127.0.0.1:5400: wsarecv: An existing connection was forcibly closed by the remote host.
