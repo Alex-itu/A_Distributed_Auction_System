@@ -1,0 +1,4 @@
+2023/10/30 13:40:39 client Aukust: Attempts to dial on port 5400
+2023/10/30 13:40:39 the connection is:  READY
+2023/10/30 13:40:40 Server: "Participant Aukust joined chitty-chat" at lamport timestamp: [9 4 1 2]
+2023/10/30 13:41:21 EOF

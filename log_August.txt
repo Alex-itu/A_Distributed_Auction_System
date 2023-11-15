@@ -1,0 +1,6 @@
+2023/10/30 13:41:54 client August: Attempts to dial on port 5400
+2023/10/30 13:41:54 the connection is:  READY
+2023/10/30 13:41:55 Server: "Participant August joined chitty-chat" at lamport timestamp: [2 2]
+2023/10/30 13:42:00 Server: "Participant Bok joined chitty-chat" at lamport timestamp: [4 3 1]
+2023/10/30 13:42:06 Server: "Participant Alike joined chitty-chat" at lamport timestamp: [7 4 1 1]
+2023/10/30 13:42:12 Bok: "This is a message" at lamport timestamp: [11 5 4 1]

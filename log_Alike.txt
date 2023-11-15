@@ -1,0 +1,7 @@
+2023/10/31 15:36:27 client Alike: Attempts to dial on port 5400
+2023/10/31 15:36:27 the connection is:  READY
+2023/10/31 15:36:28 Server: "Participant Alike joined chitty-chat" at lamport timestamp: [2 2]
+2023/10/31 15:36:44 Server: "Participant b joined chitty-chat" at lamport timestamp: [4 3 1]
+2023/10/31 15:36:57 b: "What up" at lamport timestamp: [7 4 3]
+2023/10/31 15:37:12 b: "Yee" at lamport timestamp: [11 6 5]
+2023/10/31 15:37:27 EOF
