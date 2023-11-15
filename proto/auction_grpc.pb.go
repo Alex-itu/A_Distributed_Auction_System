@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.24.3
-// source: proto/template.proto
+// source: proto/auction.proto
 
 package proto
 
@@ -246,5 +246,5 @@ var Chat_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "proto/template.proto",
+	Metadata: "proto/auction.proto",
 }
