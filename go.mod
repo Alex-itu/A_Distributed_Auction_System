@@ -1,4 +1,4 @@
-module github.com/JonasSkjodt/chitty-chat
+module github.com/Alex-itu/A_Distributed_Auction_System
 
 go 1.21.0
 

@@ -14,7 +14,8 @@ import (
 	// this has to be the same as the go.mod module,
 	// followed by the path to the folder the proto file is in.
 	// inspired by https://github.com/PatrickMatthiesen/DSYS-gRPC-template and https://articles.wesionary.team/grpc-console-chat-application-in-go-dd77a29bb5c3
-	Auction "github.com/Alex-itu/A_Distributed_Auction_System/proto"
+	Auction "https://github.com/Alex-itu/A_Distributed_Auction_System/tree/main/proto"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
