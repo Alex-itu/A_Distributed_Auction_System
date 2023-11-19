@@ -16,11 +16,13 @@ service AuctionService {
 
 message Ack {
     string message = 1;
+    int32 clientID = 2;
 }
 
 message BidAmount {
     int32 clientID = 1;
-    int32 amount = 2;
+    string clientName = 2;
+    int32 amount = 3;
 }
 
 message Outcome {
@@ -28,8 +30,11 @@ message Outcome {
 }
 
 message BackupStream {
-    //int32 bidamount = 1;
-    //something
-  }
+    message clientBids {
+        map<string, int32> bids = 1;
+    }
+    map<string, clientBids> backup = 1;
+    
+}
 
 message Void {}

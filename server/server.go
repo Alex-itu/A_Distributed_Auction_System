@@ -1,14 +1,13 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
-	"hash/fnv"
 	"io"
 	"log"
 	"net"
 	"os"
-	"strings"
 	"sync"
 
 	// this has to be the same as the go.mod module,
@@ -34,17 +33,27 @@ type RMserver struct {
 var serverClient Auction.AuctionService_connectionStreamClient
 var serverClientconn *grpc.ClientConn
 
+var serverClientTokenStream Auction.AuctionService_tokenStreamClient
+var serverNode1TokenStream Auction.AuctionService_tokenStreamClient
+var serverNode2TokenStream Auction.AuctionService_tokenStreamClient
+
+var isLeader = false
+
+var clientID = 0
+
 // flags are used to get arguments from the terminal. Flags take a value, a default value and a description of the flag.
 // to use a flag then just add it as an argument when running the program.
 var serverName = flag.String("name", "default", "Senders name") // set with "-name <name>" in terminal
 var port = flag.String("port", "5400", "Server port")           // set with "-port <port>" in terminal
 var vectorClock = []int32{0}
-var clientID = 1
 var nextNumClock = 0 // vector clock for the server
+var connPort1 = flag.String("port1", "8081", "port to another node")
+var conPort2 = flag.String("port2", "8082", "port to another node")
 
 // Maps
-var clientNames = make(map[string]Auction.Chat_MessageStreamServer)
-var clientIDs = make(map[string]int)
+var clientIDs = make(map[int]Auction.Chat_MessageStreamServer)
+var clientNames = make(map[int]string)
+var CurrentBids = make(map[int]map[int]float32)
 
 func main() {
 
@@ -75,12 +84,12 @@ func launchServer() {
 	}
 
 	// Create listener for all client that wants to bid
-	listToAllClients, err := net.Listen("tcp", "localhost:"+*port)
-	if err != nil {
-		fmt.Printf("Server %s: Failed to listen on port %s: %v \n", *serverName, *port, err)
-		log.Printf("Server %s: Failed to listen on port %s: %v", *serverName, *port, err) //If it fails to listen on the port, run launchServer method again with the next value/port in ports array
-		return
-	}
+	// listToAllClients, err := net.Listen("tcp", "localhost:"+*port)
+	// if err != nil {
+	// 	fmt.Printf("Server %s: Failed to listen on port %s: %v \n", *serverName, *port, err)
+	// 	log.Printf("Server %s: Failed to listen on port %s: %v", *serverName, *port, err) //If it fails to listen on the port, run launchServer method again with the next value/port in ports array
+	// 	return
+	// }
 
 	// makes gRPC server using the options
 	// you can add options here if you want or remove the options part entirely
@@ -119,18 +128,64 @@ func launchServerClient() {
 
 	fmt.Printf("Dialing the server from client. \n \n")
 
-	RMserver.serverClient = Auction.NewAuctionServiceClient(conn)
+	//RMserver.serverClient = Auction.NewAuctionServiceClient(conn)
+	serverClientTokenStream, err = Auction.NewAuctionServiceClient(conn).TokenStream(context.Background())
+
 	nodeServerconn = conn
 
 	defer nodeServerconn.Close()
+
+	ServerNode1Conn, err := grpc.Dial(*connPort1, opts...)
+	if err != nil {
+		fmt.Printf("failed on Dial: %v", err)
+	}
+
+	serverNode1TokenStream, err = Auction.NewAuctionServiceClient(ServerNode1Conn).TokenStream(context.Background())
+
+	fmt.Println("Successfully connected to forward node. \n \n")
+
+	ServerNode2Conn, err := grpc.Dial(*connPort1, opts...)
+	if err != nil {
+		fmt.Printf("failed on Dial: %v", err)
+	}
+
+	serverNode2TokenStream, err = Auction.NewAuctionServiceClient(ServerNode2Conn).TokenStream(context.Background())
+
+	fmt.Println("Successfully connected to backward node. \n \n")
+
+	listenToOtherNodes(serverClientTokenStream, serverNode1TokenStream, serverNode2TokenStream)
 }
 
-func DeleteUser(clientName string) {
-	if clientName != "" {
-		//Deletes the client from the clientNames map
-		delete(clientNames, clientName)
+func listenToOtherNodes(internalStream, node1Stream, node2Stream Auction.AuctionService_tokenStreamClient) {
+	for {
+		// get the next message from the stream
+		msg, err := internalStream.Recv()
+		if err == io.EOF {
+			break
+		}
+		// some other error
+		if err != nil {
+			fmt.Printf("Error: %v", err)
+			return
+		}
+
+		if msg != nil && isLeader == false {
+			CurrentBids = msg.CurrentBids
+			fmt.Printf("Updated current bids")
+		}
+
+		// send the message to all clients
+		//SendMessages(msg)
+
 	}
 }
+
+// func DeleteUser(clientName string) {
+// 	if clientName != "" {
+// 		//Deletes the client from the clientNames map
+// 		delete(clientNames, clientName)
+// 	}
+// }
 
 func (s *RMserver) MessageStream(msgStream Auction.Chat_MessageStreamServer) error {
 	for {
@@ -143,54 +198,47 @@ func (s *RMserver) MessageStream(msgStream Auction.Chat_MessageStreamServer) err
 		if err != nil {
 			return err
 		}
-		hasher := fnv.New32()
-		hasher.Write([]byte(msg.ClientName))
-		if msg.Content == fmt.Sprint(hasher.Sum32()) {
-			clientNames[msg.ClientName] = msgStream
-			clientIDs[msg.ClientName] = clientID
+		if msg.ClientID == -1 {
+			clientIDs[clientID] = msgStream
+			clientNames[clientID] = msg.ClientName
+
+			//TODO fix this shit later probs gonna crash idk
+			if msg.BidAmount > CurrentBids[msg.BidID][clientID] { //This check may need to be for the current highest bid for that auction idk
+				CurrentBids[msg.BidID][clientID] = msg.Bid
+			} else {
+				//TODO send back a message about the amount being lower than your current bid
+				msgStream.Send(&Auction.Ack{Message: "you fucked up my guy. Bid is too low", ClientID: clientID})
+			}
+
+			
+
+			msgStream.Send(&Auction.Ack{Message: "Nice job team",ClientID: clientID})
+
 			clientID++
-
 			//Adds the client to the vector clock
-			vectorClock = append(vectorClock, 1)
-			UpdateVectorClock(msg.VectorClock)
+			// vectorClock = append(vectorClock, 1)
+			// UpdateVectorClock(msg.VectorClock)
 
-			fmt.Printf("Participant %s joined chitty-chat at lamport timestamp: %d \n", msg.ClientName, vectorClock)
-			log.Printf("Participant %s joined chitty-chat at lamport timestamp: %d", msg.ClientName, vectorClock)
+			// fmt.Printf("Participant %s joined chitty-chat at lamport timestamp: %d \n", msg.ClientName, vectorClock)
+			// log.Printf("Participant %s joined chitty-chat at lamport timestamp: %d", msg.ClientName, vectorClock)
 
 			//Sends the message that a client has connected to the other clients
-			SendMessages(&Auction.ChatMessage{VectorClock: vectorClock, ClientID: int32(clientIDs[msg.ClientName]), ClientName: "Server", Content: fmt.Sprintf("Participant %s joined chitty-chat", msg.ClientName)})
-
-			hasher = nil
-
-		} else if strings.Contains(msg.Content, "Participant "+msg.ClientName+" left chitty-chat") {
-			// Counts the clients vector clock up
-			UpdateVectorClock(msg.VectorClock)
-
-			fmt.Printf("Participant %s left chitty-chat at lamport timestamp: %d \n", msg.ClientName, vectorClock)
-			log.Printf("Participant %s left chitty-chat At lamport timestamp: %d", msg.ClientName, vectorClock)
-
-			//Adds the vector clock to the message
-			msg.VectorClock = vectorClock
-
-			DeleteUser(msg.ClientName)
-
-			// send the message to all clients
-			SendMessages(msg)
+			//SendMessages(&Auction.ChatMessage{VectorClock: vectorClock, ClientID: int32(clientIDs[msg.ClientName]), ClientName: "Server", Content: fmt.Sprintf("Participant %s joined chitty-chat", msg.ClientName)})
 
 		} else {
 			// Counts the clients vector clock up
-			UpdateVectorClock(msg.VectorClock)
+			//UpdateVectorClock(msg.VectorClock)
 
 			// the stream is closed so we can exit the loop
 			// log the message
-			fmt.Printf("Received message: from %s: \"%s\" At lamport timestamp: %d \n", msg.ClientName, msg.Content, vectorClock)
-			log.Printf("Received message: from %s: \"%s\" At lamport timestamp: %d", msg.ClientName, msg.Content, vectorClock)
+			// fmt.Printf("Received message: from %s: \"%s\" At lamport timestamp: %d \n", msg.ClientName, msg.Content, vectorClock)
+			// log.Printf("Received message: from %s: \"%s\" At lamport timestamp: %d", msg.ClientName, msg.Content, vectorClock)
 
 			//Adds the vector clock to the message
-			msg.VectorClock = vectorClock
+			//msg.VectorClock = vectorClock
 
 			// send the message to all clients
-			SendMessages(msg)
+			//SendMessages(msg)
 
 		}
 	}
