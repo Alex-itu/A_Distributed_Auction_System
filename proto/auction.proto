@@ -8,7 +8,7 @@ package proto;
 // protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/auction.proto
 
 service AuctionService {
-    rpc Bid(BidAmount) returns (Ack);
+    rpc Bid(BidAmount) returns (Ack) {}
     rpc Result(Void) returns (Outcome);
     rpc connectionStream (stream BackupStream) returns (stream BackupStream);
 }
@@ -22,7 +22,7 @@ message Ack {
 message BidAmount {
     int32 clientID = 1;
     string clientName = 2;
-    int32 amount = 3;
+    float amount = 3;
 }
 
 message Outcome {
@@ -31,6 +31,7 @@ message Outcome {
 
 message BackupStream {
     map<int32, float> backup = 1;
+    string message = 2;
 }
 
 message Void {}
