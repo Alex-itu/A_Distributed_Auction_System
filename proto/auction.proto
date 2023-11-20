@@ -30,8 +30,7 @@ message Outcome {
 }
 
 message BackupStream {
-    map<int32, float32> backup = 1;
-    
+    map<int32, float> backup = 1;
 }
 
 message Void {}

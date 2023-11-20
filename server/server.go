@@ -33,9 +33,9 @@ type RMserver struct {
 var serverClient Auction.AuctionService_connectionStreamClient
 var serverClientconn *grpc.ClientConn
 
-var serverClientTokenStream Auction.AuctionService_tokenStreamClient
-var serverNode1TokenStream Auction.AuctionService_tokenStreamClient
-var serverNode2TokenStream Auction.AuctionService_tokenStreamClient
+var serverClientBackupStream Auction.AuctionService_tokenStreamClient
+var serverNode1BackupStream Auction.AuctionService_tokenStreamClient
+var serverNode2BackupStream Auction.AuctionService_tokenStreamClient
 
 var isLeader = false
 
@@ -129,7 +129,7 @@ func launchServerClient() {
 	fmt.Printf("Dialing the server from client. \n \n")
 
 	//RMserver.serverClient = Auction.NewAuctionServiceClient(conn)
-	serverClientTokenStream, err = Auction.NewAuctionServiceClient(conn).TokenStream(context.Background())
+	serverClientBackupStream, err = Auction.NewAuctionServiceClient(conn).ConnectionStream(context.Background())
 
 	nodeServerconn = conn
 
@@ -140,7 +140,7 @@ func launchServerClient() {
 		fmt.Printf("failed on Dial: %v", err)
 	}
 
-	serverNode1TokenStream, err = Auction.NewAuctionServiceClient(ServerNode1Conn).TokenStream(context.Background())
+	serverNode1BackupStream, err = Auction.NewAuctionServiceClient(ServerNode1Conn).ConnectionStream(context.Background())
 
 	fmt.Println("Successfully connected to forward node. \n \n")
 
@@ -149,14 +149,14 @@ func launchServerClient() {
 		fmt.Printf("failed on Dial: %v", err)
 	}
 
-	serverNode2TokenStream, err = Auction.NewAuctionServiceClient(ServerNode2Conn).TokenStream(context.Background())
+	serverNode2BackupStream, err = Auction.NewAuctionServiceClient(ServerNode2Conn).ConnectionStream(context.Background())
 
 	fmt.Println("Successfully connected to backward node. \n \n")
 
-	listenToOtherNodes(serverClientTokenStream, serverNode1TokenStream, serverNode2TokenStream)
+	listenToOtherNodes(serverClientBackupStream, serverNode1BackupStream, serverNode2BackupStream)
 }
 
-func listenToOtherNodes(internalStream, node1Stream, node2Stream Auction.AuctionService_tokenStreamClient) {
+func listenToOtherNodes(internalStream, node1Stream, node2Stream Auction.AuctionService_ConnectionStreamClient) {
 	for {
 		// get the next message from the stream
 		msg, err := internalStream.Recv()
@@ -170,7 +170,7 @@ func listenToOtherNodes(internalStream, node1Stream, node2Stream Auction.Auction
 		}
 
 		if msg != nil && isLeader == false {
-			CurrentBids = msg.CurrentBids
+			CurrentBids = msg.Backup
 			fmt.Printf("Updated current bids")
 		}
 
