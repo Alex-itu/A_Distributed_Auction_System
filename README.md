@@ -7,11 +7,11 @@ Server:
 
 \- Run these to boot up your servers:
 
-go run server/server.go -port 8080 -id 0 -endTime {some_timestamp_in_the_future_given_as_HH:MM:SS} (e.g. 15:39:20)
+go run server/server.go -port 8080 -id 0 -endtime {some_timestamp_in_the_future_given_as_HH:MM:SS} (e.g. 15:39:20)
 
-go run server/server.go -port 8081 -id 1 -endTime {some_timestamp_in_the_future_given_as_HH:MM:SS} (e.g. 15:39:20)
+go run server/server.go -port 8081 -id 1 -endtime {some_timestamp_in_the_future_given_as_HH:MM:SS} (e.g. 15:39:20)
 
-go run server/server.go -port 8082 -id 2 -endTime {some_timestamp_in_the_future_given_as_HH:MM:SS} (e.g. 15:39:20)
+go run server/server.go -port 8082 -id 2 -endtime {some_timestamp_in_the_future_given_as_HH:MM:SS} (e.g. 15:39:20)
 
 # How to Run Client
 \- Boot up a terminal window for you client
