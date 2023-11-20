@@ -1,0 +1,9 @@
+2023/11/20 16:33:57 Server 1 is down
+2023/11/20 16:33:57 Nice job team
+2023/11/20 16:33:57 Nice job team
+2023/11/20 16:34:02 Server 1 is down
+2023/11/20 16:34:02 Nice job team
+2023/11/20 16:34:02 Server 3 is down
+2023/11/20 16:34:06 rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp :8080: connectex: No connection could be made because the target machine actively refused it."
+2023/11/20 16:34:06 The current highest bid is: bonk 
+With a bid of: 8672534.000000

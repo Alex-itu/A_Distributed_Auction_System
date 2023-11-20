@@ -21,7 +21,7 @@ import (
 )
 
 // Same principle as in client. Flags allows for user specific arguments/values
-var clientsName = flag.String("name", "default", "Senders name")
+var clientsName = flag.String("name", "Bames Nond", "Senders name")
 var serverPorts = flag.String("serverPorts", ":8080 :8081 :8082", "TcP SeRvEr pOrTs UwU")
 var clientId = flag.Int("id", 0, "Client id")
 
@@ -135,33 +135,60 @@ func parseInput() {
 				log.Fatalf("%v", err)
 			}
 			fmt.Println(amount32)
-			ack1, err := auctionServer1.Bid(context.Background(), &gRPC.BidAmount{Amount: amount32, ClientID: clientID})
+			ack1, err := auctionServer1.Bid(context.Background(), &gRPC.BidAmount{Amount: amount32, ClientID: clientID, ClientName: *clientsName})
 			if err != nil {
+				fmt.Println("hello")
 				fmt.Printf("%v \n", err)
-				log.Fatalf("%v", err)
+				log.Printf("Server 1 is down")
+			} else {
+				fmt.Println(ack1.Message)
+				log.Println(ack1.Message)
 			}
-			fmt.Println(ack1)
-			log.Println(ack1)
 			
-			ack2, err := auctionServer2.Bid(context.Background(), &gRPC.BidAmount{Amount: amount32, ClientID: clientID})
+			ack2, err := auctionServer2.Bid(context.Background(), &gRPC.BidAmount{Amount: amount32, ClientID: clientID, ClientName: *clientsName})
 			if err != nil {
 				fmt.Printf("%v \n", err)
-				log.Fatalf("%v", err)
+				log.Printf("Server 2 is down")
+			} else {
+				fmt.Println(ack2.Message)
+				log.Println(ack2.Message)
 			}
-			fmt.Println(ack2)
-			log.Println(ack2)
 			
-			ack3, err := auctionServer3.Bid(context.Background(), &gRPC.BidAmount{Amount: amount32, ClientID: clientID})
+			ack3, err := auctionServer3.Bid(context.Background(), &gRPC.BidAmount{Amount: amount32, ClientID: clientID, ClientName: *clientsName})
 			if err != nil {
 				fmt.Printf("%v \n", err)
-				log.Fatalf("%v", err)
+				log.Printf("Server 3 is down")
+			} else {
+				fmt.Println(ack3.Message)
+				log.Println(ack3.Message)
 			}
-			fmt.Println(ack3)
-			log.Println(ack3)
 			
 
 		} else if splitInput[0] == "result" {
-			fmt.Println("This is not done!")
+			result, err := auctionServer1.Result(context.Background(), &gRPC.Void{})
+			if err != nil {
+				fmt.Printf("%v Server 1 is down. Trying on connection 2 \n", err)
+				log.Printf("%v", err)
+				result, err = auctionServer2.Result(context.Background(), &gRPC.Void{})
+				if err != nil {
+					fmt.Printf("%v Server 2 is down. Trying on connection 2 \n", err)
+					log.Printf("Server 2 is down. Trying on connection 2")
+					result, err = auctionServer3.Result(context.Background(), &gRPC.Void{})
+					if err != nil {
+						fmt.Printf("%v you are offcially fucked. All servers are dead \n", err)
+						log.Printf("%v", err)
+					}
+				}
+			}
+			
+			
+			if result.BidDone {
+				fmt.Printf("The bid is over and the winner is: %s \nWith a bid of: %f \n", result.ClientName, result.Amount)
+				log.Printf("The bid is over and the winner is: %s \nWith a bid of: %f", result.ClientName, result.Amount)
+			} else {
+				fmt.Printf("The current highest bid is: %s \nWith a bid of: %f \n", result.ClientName, result.Amount)
+				log.Printf("The current highest bid is: %s \nWith a bid of: %f", result.ClientName, result.Amount)
+			}
 		}
 	}
 }

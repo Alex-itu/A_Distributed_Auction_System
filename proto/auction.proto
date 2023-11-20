@@ -26,7 +26,9 @@ message BidAmount {
 }
 
 message Outcome {
-    int32 amount = 1;
+    float amount = 1;
+    string clientName = 2;
+    bool BidDone = 3;
 }
 
 message BackupStream {

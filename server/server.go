@@ -8,6 +8,8 @@ import (
 	"net"
 	"os"
 	"sync"
+	"strings"
+	"time"
 
 	// this has to be the same as the go.mod module,
 	// followed by the path to the folder the proto file is in.
@@ -35,15 +37,17 @@ var clientID = 0
 // to use a flag then just add it as an argument when running the program.
 var port = flag.String("port", "8080", "Server port") // set with "-port <port>" in terminal
 var serverId = flag.Int("id", 0, "Server id")
+var endtime = flag.String("endtime", "00:00:00", "The end time for the auction in HH:MM:SS")
 var server *RMserver
 
 // Maps
-var clientNames = make(map[int]string)
+var clientNames = make(map[int32]string)
 var CurrentBids = make(map[int32]float32)
 var BackupAckRecieved = make(map[int]bool)
 
-func main() {
+var auctionOver = false
 
+func main() {
 	f := setLog() //uncomment this line to log to a log.txt file instead of the console
 	defer f.Close()
 
@@ -51,13 +55,23 @@ func main() {
 	flag.Parse()
 	fmt.Println(".:server is starting:.")
 
+	go Timeout() 
 	// launch the server
 	launchServer()
-
+	
 	// code here is unreachable because launchServer occupies the current thread.
 	for {
 
 	}
+}
+
+func Timeout() {
+	theTime, _ := time.Parse(time.DateTime, strings.Split(fmt.Sprint(time.Now().String()), " ")[0] + " " + *endtime)
+	timedif := theTime.Unix() - time.Now().Add(1 * time.Hour).Unix()
+	time.Sleep(time.Duration(timedif) * time.Second)
+	fmt.Println("Closing auction")
+	log.Println("Closing auction")
+	auctionOver = true
 }
 
 func launchServer() {
@@ -103,25 +117,40 @@ func launchServer() {
 	// code here is unreachable because grpcServer.Serve occupies the current thread.
 }
 
-
-
 func (s *RMserver) Bid(cxt context.Context, msg *Auction.BidAmount) (*Auction.Ack, error) {
-	if msg.GetAmount() > HighestBid() { //This check may need to be for the current highest bid for that auction idk
-		CurrentBids[int32(clientID)] = msg.Amount
+	maxid, max := HighestBid()
+	
+	if auctionOver {
+		return &Auction.Ack{Message: "The auction is over. The winner is " + clientNames[maxid] + " with a bid of " + fmt.Sprint(max), ClientID: maxid}, nil
+	}
+	if msg.GetAmount() > max { //This check may need to be for the current highest bid for that auction idk
+		clientNames[msg.ClientID] = msg.ClientName
+		CurrentBids[msg.ClientID] = msg.Amount
 		return &Auction.Ack{Message: "Nice job team", ClientID: msg.ClientID}, nil
 	} else {
-		return &Auction.Ack{Message: "Bid is lower than current highest bid: " + fmt.Sprint(HighestBid()), ClientID: msg.ClientID}, nil
+		return &Auction.Ack{Message: "Bid is lower than current highest bid: " + fmt.Sprint(max), ClientID: msg.ClientID}, nil
 	} 
 }
 
-func HighestBid() float32 {
+func (s *RMserver) Result(cxt context.Context, msg *Auction.Void) (*Auction.Outcome, error) {
+	maxid, max := HighestBid()	
+	if auctionOver {
+		return &Auction.Outcome{Amount: max, ClientName: clientNames[maxid], BidDone: true}, nil	
+	} else {
+		return &Auction.Outcome{Amount: max, ClientName: clientNames[maxid], BidDone: false}, nil
+	}
+}
+
+func HighestBid() (int32, float32) {
 	max := float32(-1.0)
-	for _, CurrentBid := range CurrentBids {
+	maxid := int32(-1)
+	for id, CurrentBid := range CurrentBids {
 		if CurrentBid > max {
 			max = CurrentBid
+			maxid = id
 		}
 	}
-	return max
+	return maxid, max
 }
 
 // Get preferred outbound ip of this machine
@@ -141,13 +170,13 @@ func GetOutboundIP() net.IP {
 // sets the logger to use a log.txt file instead of the console
 func setLog() *os.File {
 	// Clears the log.txt file when a new server is started
-	if err := os.Truncate("log_server.txt", 0); err != nil {
+	if err := os.Truncate("log_server" + fmt.Sprint(*serverId) + ".txt", 0); err != nil {
 		fmt.Printf("Failed to truncate: %v \n", err)
 		log.Printf("Failed to truncate: %v", err)
 	}
 
 	// This connects to the log file/changes the output of the log informaiton to the log.txt file.
-	f, err := os.OpenFile("log_server.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile("log_server" + fmt.Sprint(*serverId) + ".txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		fmt.Printf("error opening file: %v", err)
 		log.Fatalf("error opening file: %v", err)

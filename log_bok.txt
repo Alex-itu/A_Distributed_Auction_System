@@ -1,12 +1,9 @@
-2023/11/20 14:47:52 message:"Nice job team"
-2023/11/20 14:47:52 message:"Nice job team"
-2023/11/20 14:47:52 message:"Nice job team"
-2023/11/20 14:48:01 message:"Bid is lower than current highest bid: 333"
-2023/11/20 14:48:01 message:"Bid is lower than current highest bid: 333"
-2023/11/20 14:48:01 message:"Bid is lower than current highest bid: 333"
-2023/11/20 14:48:29 message:"Nice job team"
-2023/11/20 14:48:29 message:"Nice job team"
-2023/11/20 14:48:29 message:"Nice job team"
-2023/11/20 14:48:33 message:"Bid is lower than current highest bid: 444"
-2023/11/20 14:48:33 message:"Bid is lower than current highest bid: 444"
-2023/11/20 14:48:33 message:"Bid is lower than current highest bid: 444"
+2023/11/20 16:33:53 Server 1 is down
+2023/11/20 16:33:53 Nice job team
+2023/11/20 16:33:53 Nice job team
+2023/11/20 16:34:08 rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp :8080: connectex: No connection could be made because the target machine actively refused it."
+2023/11/20 16:34:08 The current highest bid is: bonk 
+With a bid of: 8672534.000000
+2023/11/20 16:34:43 rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp :8080: connectex: No connection could be made because the target machine actively refused it."
+2023/11/20 16:34:43 The bid is over and the winner is: bonk 
+With a bid of: 8672534.000000
