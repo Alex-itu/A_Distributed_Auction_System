@@ -15,11 +15,10 @@ import (
 	"io"
 	"log"
 	"net"
-	"os"
 
 	"time"
 
-	hs "github.com/Alex-itu/A_Distributed_Auction_System/tree/main/proto"
+	hs "github.com/Alex-itu/A_Distributed_Auction_System/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -252,4 +251,3 @@ func ListenInternal(stream hs.TokenService_TokenChatClient, forwardStream hs.Tok
 		}
 	}
 }
-

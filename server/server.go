@@ -13,7 +13,7 @@ import (
 	// this has to be the same as the go.mod module,
 	// followed by the path to the folder the proto file is in.
 	// inspired by https://github.com/PatrickMatthiesen/DSYS-gRPC-template and https://articles.wesionary.team/grpc-console-chat-application-in-go-dd77a29bb5c3
-	Auction "github.com/Alex-itu/A_Distributed_Auction_System/tree/main/proto"
+	Auction "github.com/Alex-itu/A_Distributed_Auction_System/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -210,9 +210,7 @@ func (s *RMserver) MessageStream(msgStream Auction.Chat_MessageStreamServer) err
 				msgStream.Send(&Auction.Ack{Message: "you fucked up my guy. Bid is too low", ClientID: clientID})
 			}
 
-			
-
-			msgStream.Send(&Auction.Ack{Message: "Nice job team",ClientID: clientID})
+			msgStream.Send(&Auction.Ack{Message: "Nice job team", ClientID: clientID})
 
 			clientID++
 			//Adds the client to the vector clock
