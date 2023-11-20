@@ -53,7 +53,7 @@ var conPort2 = flag.String("port2", "8082", "port to another node")
 // Maps
 var clientIDs = make(map[int]Auction.Chat_MessageStreamServer)
 var clientNames = make(map[int]string)
-var CurrentBids = make(map[int]map[int]float32)
+var CurrentBids = make(map[int32]float32)
 
 func main() {
 

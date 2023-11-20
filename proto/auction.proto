@@ -30,10 +30,7 @@ message Outcome {
 }
 
 message BackupStream {
-    message clientBids {
-        map<string, int32> bids = 1;
-    }
-    map<string, clientBids> backup = 1;
+    map<int32, float32> backup = 1;
     
 }
 
