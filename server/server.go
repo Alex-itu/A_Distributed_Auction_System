@@ -56,21 +56,24 @@ func main() {
 	fmt.Println(".:server is starting:.")
 
 	go Timeout() 
+
 	// launch the server
 	launchServer()
-	
-	// code here is unreachable because launchServer occupies the current thread.
-	for {
-
-	}
 }
 
 func Timeout() {
-	theTime, _ := time.Parse(time.DateTime, strings.Split(fmt.Sprint(time.Now().String()), " ")[0] + " " + *endtime)
+	// theTime is the time the auction ends + the date of today (to make it possible to parse using time.Parse)
+	theTime, _ := time.Parse(time.DateTime, strings.Split(fmt.Sprint(time.Now().Add(1 * time.Hour).String()), " ")[0] + " " + *endtime)
+
+	// timedif is the time difference between the time the auction ends and the current time (given in seconds)
 	timedif := theTime.Unix() - time.Now().Add(1 * time.Hour).Unix()
+
+	// Sleeps for the time difference between the time the auction ends and the current time
 	time.Sleep(time.Duration(timedif) * time.Second)
 	fmt.Println("Closing auction")
 	log.Println("Closing auction")
+
+	// Sets the auctionOver variable to true, so that the clients can't bid anymore
 	auctionOver = true
 }
 
@@ -85,14 +88,6 @@ func launchServer() {
 		log.Printf("Server %d: Failed to listen on port %s: %v", *serverId, *port, err) //If it fails to listen on the port, run launchServer method again with the next value/port in ports array
 		return
 	}
-
-	// Create listener for all client that wants to bid
-	// listToAllClients, err := net.Listen("tcp", "localhost:"+*port)
-	// if err != nil {
-	// 	fmt.Printf("Server %s: Failed to listen on port %s: %v \n", *serverName, *port, err)
-	// 	log.Printf("Server %s: Failed to listen on port %s: %v", *serverName, *port, err) //If it fails to listen on the port, run launchServer method again with the next value/port in ports array
-	// 	return
-	// }
 
 	// makes gRPC server using the options
 	// you can add options here if you want or remove the options part entirely
@@ -123,7 +118,7 @@ func (s *RMserver) Bid(cxt context.Context, msg *Auction.BidAmount) (*Auction.Ac
 	if auctionOver {
 		return &Auction.Ack{Message: "The auction is over. The winner is " + clientNames[maxid] + " with a bid of " + fmt.Sprint(max), ClientID: maxid}, nil
 	}
-	if msg.GetAmount() > max { //This check may need to be for the current highest bid for that auction idk
+	if msg.GetAmount() > max { 
 		clientNames[msg.ClientID] = msg.ClientName
 		CurrentBids[msg.ClientID] = msg.Amount
 		return &Auction.Ack{Message: "Nice job team from: server " + fmt.Sprint(*serverId),ClientID: msg.ClientID}, nil

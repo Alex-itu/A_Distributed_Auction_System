@@ -52,9 +52,9 @@ func main() {
 	fmt.Println("--- join Server ---")
 	ConnectToServers()
 	
-	// defer ServerConn1.Close()
-	// defer ServerConn2.Close()
-	// defer ServerConn3.Close()	
+	defer ServerConn1.Close()
+	defer ServerConn2.Close()
+	defer ServerConn3.Close()	
 
 	//start the biding
 	parseInput()
@@ -170,8 +170,8 @@ func parseInput() {
 				log.Printf("Server 1 is down. Trying on connection 2")
 				result, err = auctionServer2.Result(context.Background(), &gRPC.Void{})
 				if err != nil {
-					fmt.Printf("Server 2 is down. Trying on connection 2 \n")
-					log.Printf("Server 2 is down. Trying on connection 2")
+					fmt.Printf("Server 2 is down. Trying on connection 3 \n")
+					log.Printf("Server 2 is down. Trying on connection 3")
 					result, err = auctionServer3.Result(context.Background(), &gRPC.Void{})
 					if err != nil {
 						fmt.Printf("you are offcially fucked. All servers are dead \n")
