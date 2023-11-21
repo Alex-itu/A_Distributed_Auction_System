@@ -126,7 +126,7 @@ func (s *RMserver) Bid(cxt context.Context, msg *Auction.BidAmount) (*Auction.Ac
 	if msg.GetAmount() > max { //This check may need to be for the current highest bid for that auction idk
 		clientNames[msg.ClientID] = msg.ClientName
 		CurrentBids[msg.ClientID] = msg.Amount
-		return &Auction.Ack{Message: "Nice job team", ClientID: msg.ClientID}, nil
+		return &Auction.Ack{Message: "Nice job team from: server " + fmt.Sprint(*serverId),ClientID: msg.ClientID}, nil
 	} else {
 		return &Auction.Ack{Message: "Bid is lower than current highest bid: " + fmt.Sprint(max), ClientID: msg.ClientID}, nil
 	} 

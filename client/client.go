@@ -137,8 +137,7 @@ func parseInput() {
 			fmt.Println(amount32)
 			ack1, err := auctionServer1.Bid(context.Background(), &gRPC.BidAmount{Amount: amount32, ClientID: clientID, ClientName: *clientsName})
 			if err != nil {
-				fmt.Println("hello")
-				fmt.Printf("%v \n", err)
+				fmt.Printf("Server 1 is down \n")
 				log.Printf("Server 1 is down")
 			} else {
 				fmt.Println(ack1.Message)
@@ -147,7 +146,7 @@ func parseInput() {
 			
 			ack2, err := auctionServer2.Bid(context.Background(), &gRPC.BidAmount{Amount: amount32, ClientID: clientID, ClientName: *clientsName})
 			if err != nil {
-				fmt.Printf("%v \n", err)
+				fmt.Printf("Server 2 is down \n")
 				log.Printf("Server 2 is down")
 			} else {
 				fmt.Println(ack2.Message)
@@ -156,7 +155,7 @@ func parseInput() {
 			
 			ack3, err := auctionServer3.Bid(context.Background(), &gRPC.BidAmount{Amount: amount32, ClientID: clientID, ClientName: *clientsName})
 			if err != nil {
-				fmt.Printf("%v \n", err)
+				fmt.Printf("Server 3 is down \n")
 				log.Printf("Server 3 is down")
 			} else {
 				fmt.Println(ack3.Message)
@@ -167,16 +166,16 @@ func parseInput() {
 		} else if splitInput[0] == "result" {
 			result, err := auctionServer1.Result(context.Background(), &gRPC.Void{})
 			if err != nil {
-				fmt.Printf("%v Server 1 is down. Trying on connection 2 \n", err)
-				log.Printf("%v", err)
+				fmt.Printf("Server 1 is down. Trying on connection 2 \n")
+				log.Printf("Server 1 is down. Trying on connection 2")
 				result, err = auctionServer2.Result(context.Background(), &gRPC.Void{})
 				if err != nil {
-					fmt.Printf("%v Server 2 is down. Trying on connection 2 \n", err)
+					fmt.Printf("Server 2 is down. Trying on connection 2 \n")
 					log.Printf("Server 2 is down. Trying on connection 2")
 					result, err = auctionServer3.Result(context.Background(), &gRPC.Void{})
 					if err != nil {
-						fmt.Printf("%v you are offcially fucked. All servers are dead \n", err)
-						log.Printf("%v", err)
+						fmt.Printf("you are offcially fucked. All servers are dead \n")
+						log.Printf("you are offcially fucked. All servers are dead")
 					}
 				}
 			}
