@@ -1,3 +1,5 @@
-2023/11/20 16:33:39 Server 2: Attempts to create listener on port 8082
-2023/11/20 16:33:39 Server 2: Listening at 127.0.0.1:8082 
-2023/11/20 16:34:40 Closing auction
+2023/11/21 10:31:01 Server 2: Attempts to create listener on port 8082
+2023/11/21 10:31:01 Server 2: Listening at 127.0.0.1:8082 
+2023/11/21 10:32:00 Closing auction
+2023/11/21 10:32:00 Closing auction
+2023/11/21 10:32:00 Closing auction

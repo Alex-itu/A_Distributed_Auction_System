@@ -1,0 +1,13 @@
+2023/11/21 10:26:17 Nice job team from: server 0
+2023/11/21 10:26:17 Nice job team from: server 1
+2023/11/21 10:26:17 Nice job team from: server 2
+2023/11/21 10:27:03 Bid is lower than current highest bid: 36453
+2023/11/21 10:27:03 Bid is lower than current highest bid: 36453
+2023/11/21 10:27:03 Bid is lower than current highest bid: 36453
+2023/11/21 10:27:29 Server 1 is down
+2023/11/21 10:27:29 Bid is lower than current highest bid: 36453
+2023/11/21 10:27:29 Bid is lower than current highest bid: 36453
+2023/11/21 10:27:34 Server 1 is down. Trying on connection 2
+2023/11/21 10:27:34 The current highest bid is: Bames 
+With a bid of: 36453.000000
+2023/11/21 10:30:42 EOF

@@ -1,0 +1,2 @@
+2023/11/21 10:33:44 The bid is over and the winner is:  
+With a bid of: -1.000000

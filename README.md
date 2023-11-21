@@ -18,7 +18,7 @@ go run server/server.go -port 8082 -id 2 -endtime {some_timestamp_in_the_future_
 
 \- To boot up a client you can use this:
 
-go run client/client.go -name Bames Nond -serverPorts :8080 :8081 :8082 -id 0 
+go run client/client.go -name "Bames Nond" -serverPorts ":8080 :8081 :8082" -id 0 
 
 # Some notes about the different paramaters for Server
 The servers are hardcoded to only have 3 processes so please dont try to do it with more
